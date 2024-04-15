@@ -3,7 +3,7 @@
 /node_modules
 /build
 .docker/*
-
+.idea
 .env
 !.docker/entrypoint.sh
 !.docker/postgres/Dockerfile
