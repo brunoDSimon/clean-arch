@@ -1,0 +1,29 @@
+services:
+  dashboard:
+    image: ghcr.io/brunodsimon/vida-fit-dashboard:latest
+    restart: unless-stopped
+    # Sem `ports:` de propósito — mesma lógica do serviço `api` no vidafit-api: quem fala com
+    # o mundo externo é sempre o nginx (bloco evovidafit.fitness/admin.evovidafit.fitness em
+    # vidafit-api/nginx/nginx.conf, HTTPS). Publicar 3002:80 aqui abriria um caminho HTTP puro,
+    # sem TLS, direto pro dashboard, contornando o Let's Encrypt inteiro.
+    networks:
+      - backend
+    healthcheck:
+      # 127.0.0.1 explícito — "localhost" pode resolver pra ::1 (IPv6) dentro do container,
+      # e o nginx só escuta IPv4 (ver Dockerfile) — achado em produção 2026-07-29, ficava
+      # "connection refused" pra sempre mesmo com o nginx saudável.
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:80/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.50"
+
+networks:
+  backend:
+    external: true

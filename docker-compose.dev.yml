@@ -1,0 +1,16 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vidafit_dashboard_dev
+    restart: unless-stopped
+    ports:
+      - '4200:80'
+    # Conecta na rede do vidafit-api pra acessar api:3000
+    networks:
+      - vidafit-api_default
+
+networks:
+  vidafit-api_default:
+    external: true
